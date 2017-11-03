@@ -1,12 +1,16 @@
-* version 1.0
+*! version 1.0
 * Doug Hemken
-* 25 October 2017
+* 26 October 2017
 
 capture program drop dyn2do
-program define dyn2do
-	syntax using/, [LINElength (integer 256)] [SAVing(passthru)]
+program define dyn2do, rclass
+	syntax using/, [LINElength(integer 256)] [SAVing(string)]
 	preserve
-	if ("`saving'" == "" ) local saving "`using'.do"
+	if ("`saving'" == "" ) {
+		di "  {text:No output file specified.}"
+		_replaceext using "`using'", new("do")
+		local saving "`r(newfile)'"
+		}
 	clear
 	
 * Read in file
@@ -55,6 +59,11 @@ program define dyn2do
 * Write out the result
 	quietly compress doc_line
 	outfile doc_line using "`saving'", noquote wide replace
+	display "  {text:Output saved as {it:`saving'}}"
+
+* Finish up
+	restore
+	return local outfile "`saving'"
 end
 
 
