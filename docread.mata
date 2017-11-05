@@ -1,4 +1,3 @@
-
 mata:
 string colvector docread(string scalar filename) {
 	fh = fopen(filename, "r")
@@ -12,14 +11,3 @@ string colvector docread(string scalar filename) {
 	}
 end
 
-local filename "Z:\PUBLIC_web\Stataworkshops\file_equal\README.txt"
-mata:	
-X=docread("`filename'")
-X
-end
-
-local filename "dd_do_ex.smd"
-mata:	
-X=docread("`filename'")
-X
-end
