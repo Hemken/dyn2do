@@ -1,13 +1,13 @@
 mata:
 string colvector docread(string scalar filename) {
 	fh = fopen(filename, "r")
-	string colvector doc
-	doc= J(0,1,"")
+	string colvector document
+	document= J(0,1,"")
 	while ((line=fget(fh))!=J(0,0,"")) {
-		doc = (doc\line)
+		document = (document\line)
 	}
 	fclose(fh)
-	return(doc)
+	return(document)
 	}
 end
 
