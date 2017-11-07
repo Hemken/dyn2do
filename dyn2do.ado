@@ -1,69 +1,137 @@
-*! version 1.0
-* Doug Hemken
-* 26 October 2017
+*! version 2.0
+*! Doug Hemken
+*! 7 November 2017
 
-capture program drop dyn2do
 program define dyn2do, rclass
-	syntax using/, [LINElength(integer 256)] [SAVing(string)]
-	preserve
+	syntax anything(name=docfile), [SAVing(string) replace]
+	
+	local docfile = ustrtrim(usubinstr(`"`docfile'"', `"""', "", .))
+	//confirm file `"`docfile'"'
+	
 	if ("`saving'" == "" ) {
 		di "  {text:No output file specified.}"
-		_replaceext using "`using'", new("do")
+		_replaceext using "`docfile'", new("do")
 		local saving "`r(newfile)'"
 		}
-	clear
+	capture confirm file "`saving'"
+	if (_rc==0 & "`replace'"=="") {
+		display "    {error: File `saving' already exists, specify replace}
+		error
+		}
+		
+	mata: dyn2do("`docfile'", "`saving'")
 	
-* Read in file
-	quietly infix str doc_line 1-`linelength' using "`using'"
-	quietly compress doc_line
-
-* Drop <<dd_ignore>> first
-	quietly generate dd_ignore = usubstr(doc_line, 1, 11) == "<<dd_ignore"
-	quietly replace dd_ignore = -1 if usubstr(doc_line, 1, 12) == "<</dd_ignore"
-	quietly generate ignore_block = sum(dd_ignore)
-	quietly drop if ignore_block
-	*drop dd_ignore ignore_block
-
-* Find <<dd_display: >>
-
-* There can be more than one "<<dd_display:" per line
-	quietly generate di_cnt = (ustrlen(doc_line) - ustrlen(ustrregexra(doc_line, "<<dd_display:", "")))/ustrlen("<<dd_display:")
-	quietly summarize di_cnt
-	quietly while (r(max)>1) {
-		expand = 2 if di_cnt > 1, generate(dup)
-		generate di_trunc = ustrpos(doc_line, ">>")
-		replace doc_line = usubstr(doc_line, 1, di_trunc+1) if dup == 0
-		replace doc_line = usubstr(doc_line, di_trunc+2, .) if dup
-		drop dup di_trunc dup
-		replace di_cnt = (ustrlen(doc_line) - ustrlen(ustrregexra(doc_line, "<<dd_display:", "")))/ustrlen("<<dd_display:")
-		quietly summarize di_cnt
-	}
-	quietly generate di_pos = ustrpos(doc_line, "<<dd_display:")
-	quietly generate di_end = ustrpos(doc_line, ">>") if di_pos > 0
-	quietly replace doc_line = usubstr(doc_line, di_pos+13, di_end-di_pos-13) if di_pos > 0
-	quietly replace doc_line = "display " + doc_line if di_pos > 0
-	*drop di_cnt di_end
-
-* Then extract <<dd_do>>
-	quietly generate dd_do = usubstr(doc_line, 1, 7) == "<<dd_do"
-	quietly replace dd_do = -1 if usubstr(doc_line, 1, 8) == "<</dd_do"
-	quietly generate do_block = sum(dd_do)
-	quietly keep if do_block | di_pos
-	quietly replace doc_line = "" if dd_do == 1
-	*drop di_pos dd_do do_block
-
-* Process skips? <<dd_skip_if>>
-
-* Process <<dd_remove>> ?
-
-* Write out the result
-	quietly compress doc_line
-	outfile doc_line using "`saving'", noquote wide replace
 	display "  {text:Output saved as {it:`saving'}}"
-
-* Finish up
-	restore
 	return local outfile "`saving'"
+	
 end
 
+mata:
+void function dyn2do (string scalar filename1, string scalar filename2) {
+	X=docread(filename1)
+	di_cnt = (ustrlen(X) :- ustrlen(ustrregexra(X, "<<dd_display:", ""))):/ustrlen("<<dd_display:")
+	X=expand_display_rows(X,di_cnt)
+	line_rep = strtoreal(X[.,2])
+	X=X[.,1]
+	do_blocks = mark_text_blocks(X, "<<dd_do", "<</dd_do>>", 0)
+	ignore_blocks = mark_text_blocks(X, "<<dd_ignore", "<</dd_ignore>>", 0)
+	display_lines = ustrpos(X,"<<dd_display:") :> 0
+	D = select(X, display_lines)
+	D_rep = select(line_rep, display_lines)
+	for (i=1;i<=rows(D);i++) {
+		if (D_rep[i] > 1) {
+			D[i] = usubinstr(D[i], usubstr(D[i], 1, ustrpos(D[i], "<<dd_display:"):+12), "", D_rep[i]-1)
+			}
+		}
+	D = usubinstr(D, usubstr(D, 1, ustrpos(D, "<<dd_display:"):+12), "display ", 1)
+	D = usubinstr(D, usubstr(D, ustrpos(D, ">>"), .), "", 1)
+	X[selectindex(display_lines)] = D
+	unlink(filename2)
+	docwrite(filename2, select(X, (do_blocks :| display_lines) :& !ignore_blocks))
+}
 
+string colvector docread(string scalar filename) {
+	fh = fopen(filename, "r")
+	string colvector document
+	document= J(0,1,"")
+	while ((line=fget(fh))!=J(0,0,"")) {
+		document = (document\line)
+	}
+	fclose(fh)
+	return(document)
+	}
+	
+void function docwrite(string scalar filename, ///
+		string colvector document) {
+	fh = fopen(filename, "w")
+	for (i=1; i<=length(document); i++) {
+		fput(fh, document[i])
+	}
+	fclose(fh)
+	}
+	
+string matrix function expand_display_rows(string colvector X, ///
+		real colvector count) {
+	string matrix Y
+	Y=J(0,2,"")
+
+	for(i=1;i<=rows(X);i++) {
+		if (count[i,1] !=0) {
+		for(j=1;j<=count[i];j++) {
+			Y = Y\(X[i,.],strofreal(j))
+			}
+		}
+		else {
+			Y = Y\(X[i,.],"1")
+			}
+		}
+	return(Y)
+	}
+	
+real colvector mark_text_blocks(string colvector doc, ///
+		string scalar st_tag, string scalar end_tag, ///
+		real scalar include_tags) {
+	real colvector blocks, starts, stops
+	blocks=.; starts=.; stops=.
+	starts=(ustrpos(doc, st_tag):==1)
+	stops=(ustrpos(doc, end_tag):==1)
+	if (include_tags) {
+		blocks=runningsum(starts-stops)+stops
+		}
+		else {
+		// just what is inside the blocks
+		blocks=runningsum(starts-stops)-starts
+		}
+	return(blocks)
+	}
+end
+
+program define _replaceext, rclass
+	syntax using/, new(string)
+	
+	_fileext using "`using'"
+	if "`r(extension)'" ~= "" {
+		local newfile: subinstr local using "`r(extension)'" "`new'"
+		}
+		else {
+		local newfile "`using'.`new'"
+		}
+	
+	return local newfile "`newfile'"
+
+end
+
+program define _fileext, rclass
+	syntax using/
+	local check: subinstr local using "." "", all
+	local dots = length("`using'") - length("`check'")
+	if `dots' {
+		local undot: subinstr local using "." " ", all
+		local wc : word count `undot'
+		local extension: word `wc' of `undot'
+	} 
+	else {
+		local extension
+		}
+	return local extension "`extension'"
+end
