@@ -7,14 +7,16 @@ cd "Z:/PUBLIC_Web/Stataworkshops/dyn2do/Examples"
 
 * Example 1: dd_do_ex - <<dd_do>> and <<dd_ignore>>
 dyndoc "dd_do_ex.smd", saving("dd_do_ex.html") replace
-text_equal "dd_do_ex.html" using "dd_do_ex.html_bm"
-assert "`r(comparison)'" == "1"
+file_equal "dd_do_ex.html" using "dd_do_ex.html_bm"
+assert r(equal) == 1
 
 dyntext "dd_do_ex.smd", saving("dd_do_ex.md") replace
+file_equal "dd_do_ex.md" using "dd_do_ex.md_bm"
+assert r(equal) == 1
 
 dyn2do using "dd_do_ex.smd"
-text_equal "`r(outfile)'" using "dd_do_ex.bm"
-assert "`r(comparison)'" == "1"
+file_equal "`r(outfile)'" using "dd_do_ex.html_bm"
+assert r(equal) == 1
 
 * Example 2
 dyn2do using "dd_display_ex.smd"

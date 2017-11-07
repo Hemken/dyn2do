@@ -4,24 +4,25 @@ mata: mata clear
 run docread.mata
 run docwrite.mata
 run mark_text_blocks.mata
+run expand_display_rows.mata
+run dyn2do.mata
 
-* test docread()
-local filename "Z:\PUBLIC_web\Stataworkshops\file_equal\README.txt"
-mata:	
-X=docread("`filename'")
-X
+* test Stata Corp. example
+local filename1 "http://www.stata-press.com/data/r15/markdown/dyndoc_ex.txt"
+local filename2 "examples\test.do"
+mata:
+	dyn2do("`filename1'", "`filename2'")
 end
 
-* test dyn2do sequence
-local filename1 "examples\dd_do_ex.smd"
-local filename2 "examples\dd_do_ex.do"
-// both <<dd_do>> and <<dd_ignore>>
-mata:	
-X=docread("`filename1'")
-do_blocks=mark_text_blocks(X, "<<dd_do", "<</dd_do>>", 0)
-ignore_blocks=mark_text_blocks(X, "<<dd_ignore", "<</dd_ignore>>", 0)
-unlink("`filename2'")
-docwrite("`filename2'", select(X, do_blocks :& !ignore_blocks))
+file_equal "`filename2'" using "examples\dyndoc_ex.do_bm"
+assert r(equal) == 1
+
+* with 2 on a line
+local filename1 "examples/dd_display_ex.smd"
+local filename2 "examples\test.do"
+mata:
+	dyn2do("`filename1'", "`filename2'")
 end
 
-type "`filename2'"
+file_equal "`filename2'" using "examples\dd_display_ex.do_bm"
+assert r(equal) == 1
