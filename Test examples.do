@@ -1,7 +1,4 @@
-cd "Z:/PUBLIC_Web/Stataworkshops/dyn2do"
-run "dyn2do.ado
 cscript dyn2do adofiles dyn2do.ado
-run "dyn2do.ado
 
 cd "Z:/PUBLIC_Web/Stataworkshops/dyn2do/Examples"
 
@@ -34,7 +31,7 @@ file_equal "`r(outfile)'" using "dd_display_ex.do_bm"
 assert r(equal) == 1
 
 * Example 3 - Stata's main example
-dyn2do "http://www.stata-press.com/data/r15/markdown/dyndoc_ex.txt", saving(dyndoc_ex.do)
+dyn2do "http://www.stata-press.com/data/r15/markdown/dyndoc_ex.txt", saving(dyndoc_ex.do) replace
 file_equal "`r(outfile)'" using "dyndoc_ex.do_bm"
 assert r(equal) == 1
 
