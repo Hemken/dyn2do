@@ -1,0 +1,2 @@
+sysuse auto, clear
+describe

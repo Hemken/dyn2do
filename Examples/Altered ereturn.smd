@@ -1,0 +1,87 @@
+<<dd_include:  sem/SMDincl.html>>
+
+
+# Adjusting the ereturn coefficients
+
+Suppose you have a model in which you want to adjust
+*some* of the coefficients, in order to display
+in a table alongside the original coefficients.
+
+As an example, consider a simple regression model.
+We will adjust the model by recentering the independent
+variable.  In a simple model, the slope remains unchanged
+and we just alter the constant.
+
+Set up:
+
+~~~~
+<<dd_do>>
+sysuse auto
+summarize mpg
+scalar mu = r(mean)
+<</dd_do>>
+~~~~
+
+Run the model, store the results for later display.
+
+~~~~
+<<dd_do>>
+regress price mpg
+estimates store base
+<</dd_do>>
+~~~~
+
+Next, let me alter the coefficient matrix \"by hand\".  This is
+just to make it clear what alteration I am actually making.  In
+this simple example, the constant will shift to the mean of `price`.
+
+~~~~
+<<dd_do>>
+matrix A = e(b)
+matrix A[rownumb(A,"y1"), colnumb(A,"_cons")] = _b[_cons] + _b[mpg]*mu
+*matrix A[1, 2] = _b[_cons] + _b[mpg]*mu // alternate form
+matrix list A
+<</dd_do>>
+~~~~
+
+Now we define a program that makes this alteration (it is
+only useable with this one regression!).
+
+~~~~
+<<dd_do>>
+capture program drop recenter
+program define recenter, eclass  
+  version 12
+  syntax , matrix(name) mu(real)
+  
+  matrix `matrix'[rownumb(`matrix',"y1"), colnumb(`matrix',"_cons")] = _b[_cons] + _b[mpg]*mu
+  
+  ereturn repost b = `matrix'
+end
+<</dd_do>>
+~~~~
+
+The key elements of the above program are the ugly expression
+that replaces the constant, and the `ereturn repost b`, which
+gives us back the altered `e(b)` as well as the rest of the
+ereturn results from the previous regression.  (Please note that
+the `e(V)` is now actually wrong!)  
+
+Calculate the altered coefficients, using the program.
+(Note we convert our scalar `mu`, into a macro.)
+
+~~~~
+<<dd_do>>
+recenter , matrix(A) mu(`=mu')
+<</dd_do>>
+~~~~
+
+And finally, table the results:
+
+~~~~
+<<dd_do>>
+estimates table base .
+<</dd_do>>
+~~~~
+
+<<dd_include:  sem/SMDbot.html>>

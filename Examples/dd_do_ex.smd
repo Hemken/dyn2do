@@ -1,0 +1,27 @@
+Using <<dd_do>>
+===============
+
+Let us consider an example where we study the **mpg** and **weight** variables
+in **auto.dta**.  In our examples below, we will first write the commands so
+that they will be displayed in our target HTML file.  Then, we will write the
+commands so that Stata will process the Stata dynamic tags, displaying the
+results of the Stata commands in the target HTML file.
+
+~~~~
+<<dd_ignore>>
+<<dd_do>>
+sysuse auto, clear
+describe
+<</dd_do>>
+<</dd_ignore>>
+~~~~
+
+This produces the following Stata results:
+
+~~~~
+<<dd_do>>
+sysuse auto, clear
+describe
+<</dd_do>>
+~~~~
+

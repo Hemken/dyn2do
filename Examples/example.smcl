@@ -1,0 +1,188 @@
+{smcl}
+{com}{sf}{ul off}{txt}
+{com}. 
+. /*
+> THIS IS A COMMENT AND WILL NOT BE IN THE DYNAMIC DOCUMENT
+> */
+. 
+. /***
+> 
+> Introduction to MarkDoc (heading 1) 
+> =================================== 
+> 
+> __MarkDoc__ package provides a convenient way to write dynamic document 
+> within Stata dofile editor. Before starting, remember that there are a few 
+> things that ___you must absolutely avoid___ while using MarkDoc. 
+> 
+> 1. Use only one markup language. While you are writing with _Markdown_ you 
+> may also use _HTML_ tags, but __avoid__ _LaTeX_ in combination of _HTML_ or 
+> _Markdown_.
+> 
+> 2. Only use English letters. Any unsual character (Chinese, French, or 
+> special characters) should be avoided. 
+> 
+> 3. Please make sure you that you have the __permission to write and remove 
+> files__ in your current working directory. Especially if you are a 
+> __Microsoft Windows__ user. Ideally, you should be the adminster of 
+> your system or at least, you should be able to run Stata as an adminstrator 
+> or superuser. Also pay attension to your current working directory.
+> 
+> Using Markdown (heading 2)
+> -------------------------- 
+> 
+> Writing with _Markdown_ syntax allows you to add text and graphs to
+> _smcl_ logfile and export it to a editable document format. I will 
+> demonstrate the process by using the __auto.dta__ dataset.
+> 
+> ###Get started with MarkDoc (heading 3)
+> 
+> I will open the dataset, list a few observations, and export a graph.
+> Then I will export the log file to _HTML_ format. 
+> ***/
+. 
+. 
+. quietly sysuse auto, clear
+{txt}
+{com}. list in 1/5
+
+     {txt}{c TLC}{hline 15}{c TT}{hline 7}{c TT}{hline 5}{c TT}{hline 7}{c TT}{hline 10}{c TT}{hline 7}{c TT}{hline 8}{c TRC}
+  1. {c |} make          {c |} price {c |} mpg {c |} rep78 {c |} headroom {c |} trunk {c |} weight {c |}
+     {c |} {res}AMC Concord   {txt}{c |} {res}4,099 {txt}{c |} {res} 22 {txt}{c |} {res}    3 {txt}{c |} {res}     2.5 {txt}{c |} {res}   11 {txt}{c |} {res} 2,930 {txt}{c |}
+     {c LT}{hline 11}{c TT}{hline 3}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 5}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 10}{c BT}{hline 1}{c TT}{hline 5}{c BT}{hline 8}{c RT}
+     {c |}  length   {c |}  turn   {c |}  displa~t   {c |}   gear_r~o   {c |}    foreign   {c |}
+     {c |}  {res}   186   {txt}{c |}  {res}  40   {txt}{c |}  {res}     121   {txt}{c |}   {res}    3.58   {txt}{c |}   {res}Domestic   {txt}{c |}
+     {c BLC}{hline 11}{c BT}{hline 9}{c BT}{hline 13}{c BT}{hline 14}{c BT}{hline 14}{c BRC}
+
+     {c TLC}{hline 15}{c TT}{hline 7}{c TT}{hline 5}{c TT}{hline 7}{c TT}{hline 10}{c TT}{hline 7}{c TT}{hline 8}{c TRC}
+  2. {c |} make          {c |} price {c |} mpg {c |} rep78 {c |} headroom {c |} trunk {c |} weight {c |}
+     {c |} {res}AMC Pacer     {txt}{c |} {res}4,749 {txt}{c |} {res} 17 {txt}{c |} {res}    3 {txt}{c |} {res}     3.0 {txt}{c |} {res}   11 {txt}{c |} {res} 3,350 {txt}{c |}
+     {c LT}{hline 11}{c TT}{hline 3}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 5}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 10}{c BT}{hline 1}{c TT}{hline 5}{c BT}{hline 8}{c RT}
+     {c |}  length   {c |}  turn   {c |}  displa~t   {c |}   gear_r~o   {c |}    foreign   {c |}
+     {c |}  {res}   173   {txt}{c |}  {res}  40   {txt}{c |}  {res}     258   {txt}{c |}   {res}    2.53   {txt}{c |}   {res}Domestic   {txt}{c |}
+     {c BLC}{hline 11}{c BT}{hline 9}{c BT}{hline 13}{c BT}{hline 14}{c BT}{hline 14}{c BRC}
+
+     {c TLC}{hline 15}{c TT}{hline 7}{c TT}{hline 5}{c TT}{hline 7}{c TT}{hline 10}{c TT}{hline 7}{c TT}{hline 8}{c TRC}
+  3. {c |} make          {c |} price {c |} mpg {c |} rep78 {c |} headroom {c |} trunk {c |} weight {c |}
+     {c |} {res}AMC Spirit    {txt}{c |} {res}3,799 {txt}{c |} {res} 22 {txt}{c |} {res}    . {txt}{c |} {res}     3.0 {txt}{c |} {res}   12 {txt}{c |} {res} 2,640 {txt}{c |}
+     {c LT}{hline 11}{c TT}{hline 3}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 5}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 10}{c BT}{hline 1}{c TT}{hline 5}{c BT}{hline 8}{c RT}
+     {c |}  length   {c |}  turn   {c |}  displa~t   {c |}   gear_r~o   {c |}    foreign   {c |}
+     {c |}  {res}   168   {txt}{c |}  {res}  35   {txt}{c |}  {res}     121   {txt}{c |}   {res}    3.08   {txt}{c |}   {res}Domestic   {txt}{c |}
+     {c BLC}{hline 11}{c BT}{hline 9}{c BT}{hline 13}{c BT}{hline 14}{c BT}{hline 14}{c BRC}
+
+     {c TLC}{hline 15}{c TT}{hline 7}{c TT}{hline 5}{c TT}{hline 7}{c TT}{hline 10}{c TT}{hline 7}{c TT}{hline 8}{c TRC}
+  4. {c |} make          {c |} price {c |} mpg {c |} rep78 {c |} headroom {c |} trunk {c |} weight {c |}
+     {c |} {res}Buick Century {txt}{c |} {res}4,816 {txt}{c |} {res} 20 {txt}{c |} {res}    3 {txt}{c |} {res}     4.5 {txt}{c |} {res}   16 {txt}{c |} {res} 3,250 {txt}{c |}
+     {c LT}{hline 11}{c TT}{hline 3}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 5}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 10}{c BT}{hline 1}{c TT}{hline 5}{c BT}{hline 8}{c RT}
+     {c |}  length   {c |}  turn   {c |}  displa~t   {c |}   gear_r~o   {c |}    foreign   {c |}
+     {c |}  {res}   196   {txt}{c |}  {res}  40   {txt}{c |}  {res}     196   {txt}{c |}   {res}    2.93   {txt}{c |}   {res}Domestic   {txt}{c |}
+     {c BLC}{hline 11}{c BT}{hline 9}{c BT}{hline 13}{c BT}{hline 14}{c BT}{hline 14}{c BRC}
+
+     {c TLC}{hline 15}{c TT}{hline 7}{c TT}{hline 5}{c TT}{hline 7}{c TT}{hline 10}{c TT}{hline 7}{c TT}{hline 8}{c TRC}
+  5. {c |} make          {c |} price {c |} mpg {c |} rep78 {c |} headroom {c |} trunk {c |} weight {c |}
+     {c |} {res}Buick Electra {txt}{c |} {res}7,827 {txt}{c |} {res} 15 {txt}{c |} {res}    4 {txt}{c |} {res}     4.0 {txt}{c |} {res}   20 {txt}{c |} {res} 4,080 {txt}{c |}
+     {c LT}{hline 11}{c TT}{hline 3}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 5}{c BT}{hline 5}{c TT}{hline 1}{c BT}{hline 10}{c BT}{hline 1}{c TT}{hline 5}{c BT}{hline 8}{c RT}
+     {c |}  length   {c |}  turn   {c |}  displa~t   {c |}   gear_r~o   {c |}    foreign   {c |}
+     {c |}  {res}   222   {txt}{c |}  {res}  43   {txt}{c |}  {res}     350   {txt}{c |}   {res}    2.41   {txt}{c |}   {res}Domestic   {txt}{c |}
+     {c BLC}{hline 11}{c BT}{hline 9}{c BT}{hline 13}{c BT}{hline 14}{c BT}{hline 14}{c BRC}
+
+{com}. histogram price
+{txt}(bin={res}8{txt}, start={res}3291{txt}, width={res}1576.875{txt})
+{res}{txt}
+{com}. graph export graph.png, replace width(350)
+{txt}(note: file graph.png not found)
+(file graph.png written in PNG format)
+
+{com}. 
+. /***
+> Adding a graph using Markdown
+> -----------------------------
+> 
+> In order to add a graph using Markdown, I export the graph in PNG format. 
+> You can explain the graph in the brackets and define the file path in 
+> parentheses using Markdown syntax. Note that Markdown format cannot resize the 
+> figure and it will include it at its full size. Therefore, when you write with 
+> Markdown you should resize the graphs. Of course, if you write with _LaTeX_ or 
+> _HTML_ you will be able to do anything you wish! But _Markdown_ is convertable 
+> to any format and thus is the prefered markup language for writing dynamic 
+> documents. In addition, it is a very minimalistic language. And perhaps that's 
+> what makes it so good, because it does not include numerous rules and tags to 
+> learn, compared to _HTML_ and _LaTeX_. It's simple, easy to learn, and appealing 
+> to use. 
+> 
+> ![](./graph.png)
+>  
+>  
+> Writing Dynamic Text 
+> --------------------
+>  
+> The __txt__ command can be used to write dynamic text in MarkDoc. 
+> To do so, put the value that you want to print in a Macro and then 
+> explain it using the __txt__ command. Or instead, I use the stored values 
+> that Stata returns after particular commands by typinc __return list__. 
+> 
+> In the example below, I use the summarize command, and print the r(N), r(mean), 
+> r(sd), r(min), and r(max) which are returned after the __summarize__ command. 
+> ***/
+. 
+. summarize price 
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 7}price {c |}{res}         74    6165.257    2949.496       3291      15906
+{txt}
+{com}. 
+. //OFF
+. return list 
+
+{txt}scalars:
+                  r(N) =  {res}74
+              {txt}r(sum_w) =  {res}74
+               {txt}r(mean) =  {res}6165.256756756757
+                {txt}r(Var) =  {res}8699525.974268789
+                 {txt}r(sd) =  {res}2949.495884768919
+                {txt}r(min) =  {res}3291
+                {txt}r(max) =  {res}15906
+                {txt}r(sum) =  {res}456229
+{txt}
+{com}. //ON
+. 
+. txt The dataset used for this analysis includes `r(N)' observations for                 ///
+> the __price__ variable, with mean of `r(mean)' and SD of `r(sd)'. The                   ///
+> price of cars' ranged from `r(min)' to `r(max)'.
+
+
+{txt}> The dataset used for this analysis includes 74 observations for                 the __price__ variable, with mean of 6165.256756756757 and SD of 2949.495884768919. The                   price of cars' ranged from 3291 to 15906.
+{com}. 
+. //And thi is how a regression analysis looks like in the file.
+. regress price mpg
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}        74
+{txt}{hline 13}{c +}{hline 34}   F(1, 72)        = {res}    20.26
+{txt}       Model {c |} {res}  139449474         1   139449474   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res}  495615923        72  6883554.48   {txt}R-squared       ={res}    0.2196
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.2087
+{txt}       Total {c |} {res}  635065396        73  8699525.97   {txt}Root MSE        =   {res} 2623.7
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}       price{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}mpg {c |}{col 14}{res}{space 2}-238.8943{col 26}{space 2} 53.07669{col 37}{space 1}   -4.50{col 46}{space 3}0.000{col 54}{space 4}-344.7008{col 67}{space 3}-133.0879
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 11253.06{col 26}{space 2} 1170.813{col 37}{space 1}    9.61{col 46}{space 3}0.000{col 54}{space 4} 8919.088{col 67}{space 3} 13587.03
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. /***
+> [You will find more information in this regard on my website](http://haghish.com/). 
+> You can also [Follow The Package Updates On TWITTER!](http://twitter.com/Haghish)
+> 
+> 
+> E. F. Haghish   
+> Center for Medical Biometry and Medical Informatics   
+> University of Freiburg, Germany   
+> _haghish@imbi.uni-freiburg.de_
+> 
+> ***/
+. 
+. qui log c 
+{smcl}
+{com}{sf}{ul off}

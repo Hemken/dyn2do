@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Doug Hemken" />
+<!--#include virtual="/sscc/pubs/Rmd/headInclKB.html" -->
+<link rel="stylesheet" href="/sscc/pubs/Rmd/Rmd.css" type="text/css" />
+</head>
+<body>
+<!--#include virtual="/sscc/pubs/Rmd/topInclKB.html" -->
+<h1><a href="#adjusting-the-ereturn-coefficients" id="adjusting-the-ereturn-coefficients">Adjusting the ereturn coefficients</a></h1>
+<p>Suppose you have a model in which you want to adjust <em>some</em> of the coefficients, in order to display in a table alongside the original coefficients.</p>
+<p>As an example, consider a simple regression model. We will adjust the model by recentering the independent variable.  In a simple model, the slope remains unchanged and we just alter the constant.</p>
+<p>Set up:</p>
+<pre><code>. sysuse auto
+(1978 Automobile Data)
+
+. summarize mpg
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+         mpg |         74     21.2973    5.785503         12         41
+
+. scalar mu = r(mean)
+
+</code></pre>
+<p>Run the model, store the results for later display.</p>
+<pre><code>. regress price mpg
+
+      Source |       SS           df       MS      Number of obs   =        74
+-------------+----------------------------------   F(1, 72)        =     20.26
+       Model |   139449474         1   139449474   Prob &gt; F        =    0.0000
+    Residual |   495615923        72  6883554.48   R-squared       =    0.2196
+-------------+----------------------------------   Adj R-squared   =    0.2087
+       Total |   635065396        73  8699525.97   Root MSE        =    2623.7
+
+------------------------------------------------------------------------------
+       price |      Coef.   Std. Err.      t    P&gt;|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         mpg |  -238.8943   53.07669    -4.50   0.000    -344.7008   -133.0879
+       _cons |   11253.06   1170.813     9.61   0.000     8919.088    13587.03
+------------------------------------------------------------------------------
+
+. estimates store base
+
+</code></pre>
+<p>Next, let me alter the coefficient matrix &quot;by hand&quot;.  This is just to make it clear what alteration I am actually making.  In this simple example, the constant will shift to the mean of <code>price</code>.</p>
+<pre><code>. matrix A = e(b)
+
+. matrix A[rownumb(A,&quot;y1&quot;), colnumb(A,&quot;_cons&quot;)] = _b[_cons] + _b[mpg]*mu
+
+. *matrix A[1, 2] = _b[_cons] + _b[mpg]*mu // alternate form
+. matrix list A
+
+A[1,2]
+           mpg       _cons
+y1  -238.89435   6165.2568
+
+</code></pre>
+<p>Now we define a program that makes this alteration (it is only useable with this one regression!).</p>
+<pre><code>. capture program drop recenter
+
+. program define recenter, eclass  
+  1.   version 12
+  2.   syntax , matrix(name) mu(real)
+  3.   
+.   matrix `matrix'[rownumb(`matrix',&quot;y1&quot;), colnumb(`matrix',&quot;_cons&quot;)] = _b[_co
+&gt; ns] + _b[mpg]*mu
+  4.   
+.   ereturn repost b = `matrix'
+  5. end
+
+</code></pre>
+<p>The key elements of the above program are the ugly expression that replaces the constant, and the <code>ereturn repost b</code>, which gives us back the altered <code>e(b)</code> as well as the rest of the ereturn results from the previous regression.  (Please note that the <code>e(V)</code> is now actually wrong!)</p>
+<p>Calculate the altered coefficients, using the program. (Note we convert our scalar <code>mu</code>, into a macro.)</p>
+<pre><code>. recenter , matrix(A) mu(`=mu')
+
+</code></pre>
+<p>And finally, table the results:</p>
+<pre><code>. estimates table base .
+
+----------------------------------------
+    Variable |    base        active    
+-------------+--------------------------
+         mpg | -238.89435   -238.89435  
+       _cons |  11253.061    6165.2568  
+----------------------------------------
+
+</code></pre>
+<!--#include virtual="/sscc/pubs/Rmd/bottomInclKB.html" -->
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+</html>
