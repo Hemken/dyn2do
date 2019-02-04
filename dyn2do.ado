@@ -1,9 +1,11 @@
-*! version 2.0
+*! version 2.1
 *! Doug Hemken
-*! 7 November 2017
+*! 4 Feb 2019
 
 program define dyn2do, rclass
 	syntax anything(name=docfile), [SAVing(string) replace]
+	
+	version 15
 	
 	local docfile = ustrtrim(usubinstr(`"`docfile'"', `"""', "", .))
 	//confirm file `"`docfile'"'
@@ -108,6 +110,7 @@ end
 
 program define _replaceext, rclass
 	syntax using/, new(string)
+	version 15
 	
 	_fileext using "`using'"
 	if "`r(extension)'" ~= "" {
@@ -123,6 +126,7 @@ end
 
 program define _fileext, rclass
 	syntax using/
+	version 15
 	local check: subinstr local using "." "", all
 	local dots = length("`using'") - length("`check'")
 	if `dots' {
